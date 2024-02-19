@@ -1,8 +1,9 @@
 import requests
 import json
+import os 
 
-API_KEY = "fLy3EaDKfGrBciKurvwYFFNo"
-SECRET_KEY = "YP75RPNdZHvqbKMsn5INELcMQ8AVGK3E"
+API_KEY = os.getenv("API_KEY") 
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 def main():
         
