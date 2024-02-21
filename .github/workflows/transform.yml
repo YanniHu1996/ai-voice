@@ -1,0 +1,77 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Transform
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  API_KEY: ${{ secrets.API_KEY }}
+  SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
+jobs:
+  transform:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.12"
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Create task
+      id: create-task
+      run: |
+        speech_url=https://yannihu1996.github.io/ai-voice/record/吴晨旭讲五行基础.mp3
+        result=$(python voice2txt.py create --speech_url $speech_url)
+
+        # {"log_id":17083226624200321,"task_status":"Created","task_id":"65d2ef66679f6f0001cb5d2b"}
+        log_id=$(echo $result | jq -r '.log_id')
+        task_id=$(echo $result | jq -r '.task_id')
+        task_status=$(echo $result | jq -r '.task_status')
+
+        content=''
+        content=$content"\n-Task ID: $task_id"
+        content=$content"\n-Task Status: $task_status"
+        content=$content"\n-Log ID: $log_id"
+        content=$content"\n-Speech URL: $speech_url"
+
+        echo $content
+
+        issur_url=$(gh issue create -R YanniHu1996/ai-voice --title '吴晨旭讲五行基础' --body "$content")
+        echo $issue_url
+        echo "issue_url=$issue_url" >> "$GITHUB_OUTPUT"
+
+
+    - name: Check task
+      id: check-task
+      run: |
+        issue_url="${{ steps.create-task.outputs.issue_url }}"
+        issue_id=$(echo "$issue_url" | awk -F'/' '{print $NF}')
+
+        for i in {1..10} ;do
+          result=$(python voice2txt.py check --issue_id $issue_id)
+          task_status=$(echo $result | jq -r '.task_status')
+          if [ "$task_status" == "Finished" ]; then
+            break
+          fi
+          sleep 10
+        done
+
+
+
+
+
+
