@@ -45,10 +45,14 @@ jobs:
         task_status=$(echo $result | jq -r '.task_status')
 
         content=''
-        content=$content"\n-Task ID: $task_id"
-        content=$content"\n-Task Status: $task_status"
-        content=$content"\n-Log ID: $log_id"
-        content=$content"\n-Speech URL: $speech_url"
+        content=$content"-Task ID: $task_id
+        "
+        content=$content"-Task Status: $task_status
+        "
+        content=$content"-Log ID: $log_id
+        "
+        content=$content"-Speech URL: $speech_url
+        "
 
         echo $content
 
@@ -66,7 +70,8 @@ jobs:
         TASK_ID: ${{ steps.create-task.outputs.task_id }}
       run: |
         issue_url="$ISSUE_URL"
-        taks_id="$TASK_ID"
+        task_id="$TASK_ID"
+        echo $task_id
 
         issue_id=$(echo "$issue_url" | awk -F'/' '{print $NF}')
         for i in {1..200} ;do
