@@ -74,7 +74,7 @@ jobs:
         for i in {1..200} ;do
           result=$(python voice2txt.py check --task_id $task_id)
           echo $result
-          task_status=$(echo $result | jq -r '.task_status')
+          task_status=$(echo $result | jq -r " .tasks_info | .[0].task_status")
 
           if [ "$task_status" == "Running" ]; then
             gh issue comment -R YanniHu1996/ai-voice --body "Task is running" $issue_id
