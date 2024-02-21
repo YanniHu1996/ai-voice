@@ -36,7 +36,7 @@ jobs:
     - name: Create task
       id: create-task
       run: |
-        speech_url=https://yannihu1996.github.io/ai-voice/record/吴晨旭讲五行基础.mp3
+        speech_url=https://yannihu1996.github.io/ai-voice/record/wuchengxujiangwuxingjichu..mp3
         result=$(python voice2txt.py create --speech_url $speech_url)
 
         # {"log_id":17083226624200321,"task_status":"Created","task_id":"65d2ef66679f6f0001cb5d2b"}
