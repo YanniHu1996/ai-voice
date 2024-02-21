@@ -52,23 +52,38 @@ jobs:
 
         issur_url=$(gh issue create -R YanniHu1996/ai-voice --title '吴晨旭讲五行基础' --body "$content")
         echo $issue_url
+
+        echo "task_id=$task_id" >> "$GITHUB_OUTPUT"
         echo "issue_url=$issue_url" >> "$GITHUB_OUTPUT"
 
 
     - name: Check task
       id: check-task
+      env:
+        ISSUE_URL: ${{ steps.create-task.outputs.issue_url }}
+        TASK_ID: ${{ steps.create-task.outputs.task_id }}
       run: |
-        issue_url="${{ steps.create-task.outputs.issue_url }}"
-        issue_id=$(echo "$issue_url" | awk -F'/' '{print $NF}')
+        issue_url="$ISSUE_URL"
+        taks_id="$TASK_ID"
 
-        for i in {1..10} ;do
-          result=$(python voice2txt.py check --issue_id $issue_id)
+        issue_id=$(echo "$issue_url" | awk -F'/' '{print $NF}')
+        for i in {1..200} ;do
+          result=$(python voice2txt.py check --task_id $task_id)
           task_status=$(echo $result | jq -r '.task_status')
-          if [ "$task_status" == "Finished" ]; then
+
+          if [ "$task_status" == "Running" ]; then
+            gh issue comment -R YanniHu1996/ai-voice --body "Task is running" $issue_id
+            echo "Task is running"
+          else
+            message="Task is finished, status: $task_status"
+            echo $message
+            gh issue comment -R YanniHu1996/ai-voice --body "$message" $issue_id
             break
           fi
-          sleep 10
+
+          sleep 1
         done
+
 
 
 
