@@ -44,14 +44,10 @@ jobs:
         task_id=$(echo $result | jq -r '.task_id')
         task_status=$(echo $result | jq -r '.task_status')
 
-        content=''
-        content=$content"-Task ID: $task_id
-        "
-        content=$content"-Task Status: $task_status
-        "
-        content=$content"-Log ID: $log_id
-        "
-        content=$content"-Speech URL: $speech_url
+        content="- Task ID: $task_id
+        - Task Status: $task_status
+        - Log ID: $log_id
+        - Speech URL: $speech_url
         "
 
         echo $content
@@ -77,6 +73,7 @@ jobs:
         issue_id=$(echo "$issue_url" | awk -F'/' '{print $NF}')
         for i in {1..200} ;do
           result=$(python voice2txt.py check --task_id $task_id)
+          echo $result
           task_status=$(echo $result | jq -r '.task_status')
 
           if [ "$task_status" == "Running" ]; then
